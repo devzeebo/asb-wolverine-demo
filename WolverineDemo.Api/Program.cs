@@ -25,17 +25,18 @@ builder.Services.AddWolverine(opts =>
     var asbFqdn = builder.Configuration.GetValue<string>("Wolverine:ServiceBus:FQDN")!;
     opts.UseAzureServiceBus(asbFqdn, new DefaultAzureCredential())
         .AutoProvision()
-        .EnableWolverineControlQueues()
-        .UseConventionalRouting(convention => convention
-            .IncludeTypes(type => type.GetTypeInfo().GetCustomAttribute<ServiceBusMessageAttribute>() is not null)
-            .QueueNameForListener(AzureServiceBusQueueNames.GetAzureServiceBusQueueName)
-            .QueueNameForSender(AzureServiceBusQueueNames.GetAzureServiceBusQueueName));
+        .EnableWolverineControlQueues();
+    // .UseConventionalRouting(convention => convention
+    //     .IncludeTypes(type => type.GetTypeInfo().GetCustomAttribute<ServiceBusMessageAttribute>() is not null)
+    //     .QueueNameForListener(AzureServiceBusQueueNames.GetAzureServiceBusQueueName)
+    //     .QueueNameForSender(AzureServiceBusQueueNames.GetAzureServiceBusQueueName));
 
     opts.ListenToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
         .RequireSessions()
         .Sequential();
     opts.PublishMessage<TestHandler.Command>()
-        .ToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!);
+        .ToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
+        .RequireSessions();
 
     opts.PersistMessagesWithSqlServer(builder.Configuration.GetConnectionString("sql")!, "Wolverine")
         .EnableCommandQueues(false);

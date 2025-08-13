@@ -1,0 +1,130 @@
+Service Name: WolverineDemo.Api
+├── DefaultExecutionTimeout
+│   └── 00:01:00
+├── AutoBuildMessageStorageOnStartup
+│   └── None
+├── TypeLoadMode
+│   └── Dynamic
+├── ExternalTransportsAreStubbed
+│   └── True
+├── Assemblies
+│   └── WolverineDemo.Api (application)
+├── Extensions
+│   ├── Wolverine.SqlServer.SqlServerBackedPersistence
+│   └── Wolverine.EntityFrameworkCore.Internals.EntityFrameworkCoreBackedPersistence
+└── Serializers
+    └── ┌──────────────────┬────────────────────────────────────┐
+        │ Content Type     │ Serializer                         │
+        ├──────────────────┼────────────────────────────────────┤
+        │ binary/envelope  │ EnvelopeReaderWriter               │
+        │ binary/wolverine │ IntrinsicSerializer                │
+        │ application/json │ SystemTextJsonSerializer (default) │
+        └──────────────────┴────────────────────────────────────┘
+
+Handler Discovery Rules
+├── Assemblies
+│   └── WolverineDemo.Api
+├── Handler Type Rules
+│   ├── Include:
+│   │   ├── Name ends with 'Handler'
+│   │   ├── Name ends with 'Consumer'
+│   │   ├── Inherits from Wolverine.Saga
+│   │   ├── Implements Wolverine.IWolverineHandler
+│   │   └── Has attribute Wolverine.Attributes.WolverineHandlerAttribute
+│   └── Exclude:
+│       ├── Not GeneratedStreamStateQueryHandler
+│       ├── Is not a public type
+│       └── Has attribute Wolverine.Attributes.WolverineIgnoreAttribute
+└── Handler Method Rules
+    ├── Include:
+    │   ├── Method name is 'Handle' (case sensitive)
+    │   ├── Method name is 'HandleAsync' (case sensitive)
+    │   ├── Method name is 'Handles' (case sensitive)
+    │   ├── Method name is 'HandlesAsync' (case sensitive)
+    │   ├── Method name is 'Consume' (case sensitive)
+    │   ├── Method name is 'ConsumeAsync' (case sensitive)
+    │   ├── Method name is 'Consumes' (case sensitive)
+    │   ├── Method name is 'ConsumesAsync' (case sensitive)
+    │   ├── Method name is 'Orchestrate' (case sensitive)
+    │   ├── Method name is 'OrchestrateAsync' (case sensitive)
+    │   ├── Method name is 'Orchestrates' (case sensitive)
+    │   ├── Method name is 'OrchestratesAsync' (case sensitive)
+    │   ├── Method name is 'Start' (case sensitive)
+    │   ├── Method name is 'StartAsync' (case sensitive)
+    │   ├── Method name is 'Starts' (case sensitive)
+    │   ├── Method name is 'StartsAsync' (case sensitive)
+    │   ├── Method name is 'StartOrHandle' (case sensitive)
+    │   ├── Method name is 'StartOrHandleAsync' (case sensitive)
+    │   ├── Method name is 'StartsOrHandles' (case sensitive)
+    │   ├── Method name is 'StartsOrHandlesAsync' (case sensitive)
+    │   ├── Method name is 'NotFound' (case sensitive)
+    │   ├── Method name is 'NotFoundAsync' (case sensitive)
+    │   └── Has attribute [WolverineHandler]
+    └── Exclude:
+        ├── Method is declared by object
+        ├── IDisposable.Dispose()
+        ├── IAsyncDisposable.DisposeAsync()
+        ├── Contains Generic Parameters
+        ├── Special Name
+        ├── Has attribute [WolverineIgnore]
+        ├── Has no arguments
+        ├── Cannot determine a valid message type
+        └── Returns a primitive type
+
+                                                                      Message Handlers
+┌──────────────────────────────────────────┬─────────────────────┬───────────────────────────────────────────────────────────────┬─────────────────────────┐
+│ Message Name                             │ Message Type        │ Handler.Method()                                              │ Generated Type Name     │
+│                                          │   namespace         │   namespace                                                   │                         │
+├──────────────────────────────────────────┼─────────────────────┼───────────────────────────────────────────────────────────────┼─────────────────────────┤
+│ TestHandler_WolverineDemo.Api.TestHandle │ TestHandler.Command │ TestHandler.Handle(command, cancellationToken.EscapeMarkup()) │ CommandHandler279873427 │
+│ r+Command                                │   WolverineDemo.Api │   WolverineDemo.Api                                           │                         │
+└──────────────────────────────────────────┴─────────────────────┴───────────────────────────────────────────────────────────────┴─────────────────────────┘
+
+                                         Message Routing
+┌────────────────────────────────────────┬────────────────────────────────────┬──────────────────┐
+│ Message Type                           │ Destination                        │ Content Type     │
+├────────────────────────────────────────┼────────────────────────────────────┼──────────────────┤
+│ Wolverine.Runtime.Agents.IAgentCommand │ local://agents/                    │ application/json │
+│ WolverineDemo.Api.TestHandler.Command  │ asb://queue/wolverinedemo.api.test │ application/json │
+└────────────────────────────────────────┴────────────────────────────────────┴──────────────────┘
+
+                                                                Subscriptions
+┌──────────────────────────────────────────┬─────────────────────────────┬──────────────────┬───────────────────────────────────────────────┐
+│ Uri                                      │ Name                        │ Mode             │ Serializer(s)                                 │
+├──────────────────────────────────────────┼─────────────────────────────┼──────────────────┼───────────────────────────────────────────────┤
+│ asb://queue/wolverine-dead-letter-queue  │ wolverine-dead-letter-queue │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ asb://queue/wolverine.control.1621364715 │ Control                     │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ asb://queue/wolverinedemo.api.test       │ WolverineDemo.Api.Test      │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ local://agents/                          │ agents                      │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ local://default/                         │ default                     │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ local://durable/                         │ durable                     │ Durable          │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ local://replies/                         │ replies                     │ BufferedInMemory │ IntrinsicSerializer, SystemTextJsonSerializer │
+│ local://scheduled/                       │ scheduled                   │ Durable          │ IntrinsicSerializer, SystemTextJsonSerializer │
+└──────────────────────────────────────────┴─────────────────────────────┴──────────────────┴───────────────────────────────────────────────┘
+
+                                                                         Listeners
+┌────────────────────────────────────┬────────────────────────┬──────────────────┬────────────────────────────────────┬────────────────────────────────────┐
+│ Uri                                │ Name                   │ Mode             │ Execution                          │ Serializers                        │
+├────────────────────────────────────┼────────────────────────┼──────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ local://agents/                    │ agents                 │ BufferedInMemory │ MaxDegreeOfParallelism: 20,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ asb://queue/wolverine.control.1621 │ Control                │ BufferedInMemory │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│ 364715                             │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ local://default/                   │ default                │ BufferedInMemory │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ local://durable/                   │ durable                │ Durable          │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ local://replies/                   │ replies                │ BufferedInMemory │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ local://scheduled/                 │ scheduled              │ Durable          │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+│ asb://queue/wolverinedemo.api.test │ WolverineDemo.Api.Test │ BufferedInMemory │ MaxDegreeOfParallelism: 16,        │ IntrinsicSerializer,               │
+│                                    │                        │                  │ EnsureOrdered: False               │ SystemTextJsonSerializer           │
+└────────────────────────────────────┴────────────────────────┴──────────────────┴────────────────────────────────────┴────────────────────────────────────┘
+
+Error HandlingFailure rules specific to a message type
+are applied before the global failure rules
+
+Global Failure Rules
+└── All exceptions
+    └── Move to Error Queue

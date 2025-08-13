@@ -26,10 +26,6 @@ builder.Services.AddWolverine(opts =>
     opts.UseAzureServiceBus(asbFqdn, new DefaultAzureCredential())
         .AutoProvision()
         .EnableWolverineControlQueues();
-    // .UseConventionalRouting(convention => convention
-    //     .IncludeTypes(type => type.GetTypeInfo().GetCustomAttribute<ServiceBusMessageAttribute>() is not null)
-    //     .QueueNameForListener(AzureServiceBusQueueNames.GetAzureServiceBusQueueName)
-    //     .QueueNameForSender(AzureServiceBusQueueNames.GetAzureServiceBusQueueName));
 
     opts.ListenToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
         .RequireSessions()

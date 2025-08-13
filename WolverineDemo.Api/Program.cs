@@ -31,23 +31,17 @@ builder.Services.AddWolverine(opts =>
             .QueueNameForListener(AzureServiceBusQueueNames.GetAzureServiceBusQueueName)
             .QueueNameForSender(AzureServiceBusQueueNames.GetAzureServiceBusQueueName));
 
-    opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
-    opts.Policies.UseDurableInboxOnAllListeners();
-    opts.Policies.UseDurableLocalQueues();
-
-    // opts.Policies
-    //     .ConfigureConventionalLocalRouting()
-    //     .Named(QueueName);
-
-    opts.PersistMessagesWithSqlServer(builder.Configuration.GetConnectionString("sql")!, "Wolverine")
-        .EnableCommandQueues(false);
-
     opts.ListenToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
         .RequireSessions()
         .Sequential();
     opts.PublishMessage<TestHandler.Command>()
         .ToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!);
-    //     .RequireSessions();
+
+    opts.PersistMessagesWithSqlServer(builder.Configuration.GetConnectionString("sql")!, "Wolverine")
+        .EnableCommandQueues(false);
+    opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
+    opts.Policies.UseDurableInboxOnAllListeners();
+    opts.Policies.UseDurableLocalQueues();
 
     opts.Policies.AutoApplyTransactions();
     opts.UseEntityFrameworkCoreTransactions();

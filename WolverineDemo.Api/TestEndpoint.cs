@@ -24,7 +24,7 @@ public class TestEndpoint
         [FromServices] IMessageBus wolverine
     )
     {
-        var response = await wolverine.InvokeAsync<TestApi.Response>(new TestApi.Request { Id = request.Id }.WithGroupId("sequential"));
+        var response = await wolverine.InvokeAsync<TestApi.Response>(new TestHandler.Command { Id = request.Id });
 
         return new()
         {

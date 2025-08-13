@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WolverineDemo.Api", "WolverineDemo.Api\WolverineDemo.Api.csproj", "{310F819F-FF88-4B7B-B9A2-3BCDC199788E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WolverineDemo.Tests", "WolverineDemo.Tests\WolverineDemo.Tests.csproj", "{AA98A42E-07A3-47F2-8EA1-FE11D79B9E2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{310F819F-FF88-4B7B-B9A2-3BCDC199788E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{310F819F-FF88-4B7B-B9A2-3BCDC199788E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{310F819F-FF88-4B7B-B9A2-3BCDC199788E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA98A42E-07A3-47F2-8EA1-FE11D79B9E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA98A42E-07A3-47F2-8EA1-FE11D79B9E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA98A42E-07A3-47F2-8EA1-FE11D79B9E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA98A42E-07A3-47F2-8EA1-FE11D79B9E2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

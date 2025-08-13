@@ -22,63 +22,37 @@ builder.Services.AddWolverine(opts =>
 {
     opts.Discovery.IncludeAssembly(typeof(TestHandler).Assembly);
 
-    // var asbConnection = builder.Configuration.GetValue<string>("Wolverine:ServiceBus:ConnectionString")!;
     var asbFqdn = builder.Configuration.GetValue<string>("Wolverine:ServiceBus:FQDN")!;
     opts.UseAzureServiceBus(asbFqdn, new DefaultAzureCredential())
-    // opts.UseAzureServiceBus(asbConnection)
         .AutoProvision()
         .EnableWolverineControlQueues()
         .UseConventionalRouting(convention => convention
             .IncludeTypes(type => type.GetTypeInfo().GetCustomAttribute<ServiceBusMessageAttribute>() is not null)
-            .QueueNameForListener(GetAzureServiceBusQueueName)
-            .QueueNameForSender(GetAzureServiceBusQueueName));
+            .QueueNameForListener(AzureServiceBusQueueNames.GetAzureServiceBusQueueName)
+            .QueueNameForSender(AzureServiceBusQueueNames.GetAzureServiceBusQueueName));
 
     opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
     opts.Policies.UseDurableInboxOnAllListeners();
     opts.Policies.UseDurableLocalQueues();
 
-    opts.Policies
-        .ConfigureConventionalLocalRouting()
-        .Named(QueueName);
+    // opts.Policies
+    //     .ConfigureConventionalLocalRouting()
+    //     .Named(QueueName);
 
     opts.PersistMessagesWithSqlServer(builder.Configuration.GetConnectionString("sql")!, "Wolverine")
         .EnableCommandQueues(false);
 
-    opts.ListenToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
-        .RequireSessions()
-        .Sequential();
-    opts.PublishMessage<TestHandler.Command>()
-        .ToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
-        .RequireSessions();
+    // opts.ListenToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
+    //     .RequireSessions()
+    //     .Sequential();
+    // opts.PublishMessage<TestHandler.Command>()
+    //     .ToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
+    //     .RequireSessions();
 
     opts.Policies.AutoApplyTransactions();
     opts.UseEntityFrameworkCoreTransactions();
 
     opts.AutoBuildMessageStorageOnStartup = AutoCreate.None;
-
-    Console.WriteLine(opts.DescribeHandlerMatch(typeof(TestHandler)));
-
-    string? GetAzureServiceBusQueueName(Type messageType)
-    {
-        if (messageType.GetTypeInfo().GetCustomAttribute<ServiceBusMessageAttribute>() is var attr && attr is null)
-        {
-            return null;
-        }
-        return attr?.QueueName ?? QueueName(messageType);
-    }
-
-    string QueueName(Type messageType)
-    {
-        var ns = messageType.Namespace ?? "Default";
-
-        if (messageType.DeclaringType?.Name.EndsWith("Handler", StringComparison.OrdinalIgnoreCase) == true)
-        {
-            var baseName = messageType.DeclaringType.Name[0..^"Handler".Length];
-            return $"{ns}.{baseName}";
-        }
-
-        return $"{ns}.{messageType.Name}";
-    }
 });
 
 var app = builder.Build();

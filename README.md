@@ -1,6 +1,17 @@
 # Wolverine Demo
 
-This project demonstrates Wolverine with local development infrastructure using Docker Compose and Azure Identity for Service Bus authentication.
+This project demonstrates Wolverine over Azure Service Bus.
+
+## What is this?
+
+This is a **demo application** showcasing how to use the Wolverine framework with:
+
+- **ASP.NET**: HTTP endpoints
+- **Wolverine Framework**: Message handling and workflow orchestration
+- **Entity Framework Core**: Data access with SQL Server, Wolverine's outbox and inbox, and Wolverine's durable queues
+- **Azure Service Bus**: Message queuing and pub/sub
+
+The demo is designed to help developers understand how to integrate these technologies together in a .NET 8 application.
 
 ## Local Development Setup
 
@@ -26,17 +37,12 @@ This will start:
   - Password: `Password123!`
   - Database: `WolverineDemo` (will be created automatically)
 
-- **Azure Service Bus Emulator** on port 44444
-
-  - Uses the official Microsoft Azure Service Bus emulator container
-  - Management endpoint available on port 5300
-
 ### Azure Identity Configuration
 
 This project uses Azure Identity for Service Bus authentication instead of connection strings. This provides:
 
 - **Secure authentication**: No hardcoded connection strings or keys
-- **Environment flexibility**: Works with local emulator and production Azure
+- **Environment flexibility**: Works with local development and Azure
 - **Modern Azure practices**: Uses token-based authentication
 
 #### Local Development Setup
@@ -57,14 +63,88 @@ az account set --subscription "Your Subscription Name"
 
 The application will automatically use `AzureCliCredential` in development mode, which reads from your Azure CLI login.
 
-#### Production Configuration
+### Running the Application
 
-In production, the application uses `DefaultAzureCredential` which supports:
+1. **Navigate to the API project**:
 
-- **Managed Identity** (when running in Azure)
-- **Service Principal** (via environment variables)
-- **Azure CLI** (for local development)
-- **Visual Studio credentials**
+```bash
+cd WolverineDemo.Api
+```
+
+2. **Update the Service Bus FQDN** in user secrets:
+
+```jsonc
+{
+  "Wolverine": {
+    "ServiceBus": {
+      "FQDN": "your-namespace.servicebus.windows.net"
+    }
+  }
+}
+```
+
+3. **Run the application**:
+
+```bash
+dotnet run
+```
+
+Or using the .NET CLI:
+
+```bash
+dotnet watch run
+```
+
+The API will be available at:
+
+- **API**: http://localhost:5000
+- **Swagger UI**: http://localhost:5000/swagger
+
+### Running Tests
+
+1. **Navigate to the solution root**:
+
+```bash
+cd /path/to/wolverine-demo
+```
+
+2. **Run all tests**:
+
+```bash
+dotnet test
+```
+
+3. **Run tests with specific project**:
+
+```bash
+dotnet test WolverineDemo.Tests
+```
+
+4. **Run tests with watch mode**:
+
+```bash
+dotnet watch test
+```
+
+### Building the Project
+
+1. **Build the entire solution**:
+
+```bash
+dotnet build
+```
+
+2. **Build specific project**:
+
+```bash
+dotnet build WolverineDemo.Api
+```
+
+3. **Build in Release mode**:
+
+```bash
+dotnet build --configuration Release
+```
 
 ### Stopping Services
 
@@ -83,22 +163,17 @@ docker-compose down -v
 The services include health checks to ensure they're ready:
 
 - SQL Server: Checks if the database is responding
-- Azure Service Bus Emulator: Verifies the service is running on port 5300
 
 ### Connection Details
 
 The application is configured to connect to these local services via the `appsettings.json` file:
 
-- **SQL Server**: `Server=localhost,1433;Database=WolverineDemo;User Id=sa;Password=Password123!;TrustServerCertificate=true`
-- **Azure Service Bus**: Uses FQDN `localhost:44444` with Azure Identity token authentication
+- **SQL Server**: `Server=127.0.0.1,1433;Database=WolverineDemo;User Id=sa;Password=Password123!;TrustServerCertificate=true`
+- **Azure Service Bus**: Configure the FQDN in the `Wolverine:ServiceBus:FQDN` setting
 
-### Service Bus Emulator Configuration
+### Database Initialization
 
-The Service Bus emulator is configured using `config.json` which includes:
-
-- A default namespace: `wolverine-demo-asb`
-
-You can modify `config.json` to add more queues, topics, and subscriptions as needed for your development.
+The SQL Server container will start with an empty database. You may need to run your application's database initialization/migration scripts to create the required tables and schema.
 
 ### Troubleshooting
 
@@ -109,24 +184,4 @@ If you encounter connection issues:
 3. View logs: `docker-compose logs [service-name]`
 4. Restart services: `docker-compose restart`
 5. Verify Azure CLI login: `az account show`
-6. Check Service Bus emulator health: `curl http://localhost:5300`
-
-### Database Initialization
-
-The SQL Server container will start with an empty database. You may need to run your application's database initialization/migration scripts to create the required tables and schema.
-
-### Azure Service Bus Emulator Notes
-
-This setup uses the official Microsoft Azure Service Bus emulator container (`mcr.microsoft.com/azure-messaging/servicebus-emulator:latest`) as documented in the [Microsoft documentation](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?source=recommendations&tabs=docker-linux-container). The emulator provides a local development environment that closely mimics the Azure Service Bus service, allowing you to develop and test your messaging functionality locally.
-
-The emulator runs on port 44444 (mapped from the container's internal port 5672) and includes a management interface on port 5300 for monitoring and debugging.
-
-### Azure Identity Benefits
-
-Using Azure Identity instead of connection strings provides several advantages:
-
-- **Security**: No hardcoded secrets in configuration files
-- **Compliance**: Follows Azure security best practices
-- **Flexibility**: Easy to switch between development and production environments
-- **Auditing**: Better tracking of service access and authentication
-- **Rotation**: Automatic credential rotation when using Managed Identity
+6. Check if the API is running: `curl http://localhost:5000/swagger`

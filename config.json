@@ -1,0 +1,12 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "wolverine-demo-asb"
+      }
+    ],
+    "Logging": {
+      "Type": "File"
+    }
+  }
+}

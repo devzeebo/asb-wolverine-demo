@@ -15,7 +15,7 @@ public class TestEndpoint
 
         public record Response
         {
-            public required string TransactionId { get; init; }
+            public string? TransactionId { get; init; }
         }
     }
 
@@ -24,7 +24,7 @@ public class TestEndpoint
         [FromServices] IMessageBus wolverine
     )
     {
-        var response = await wolverine.InvokeAsync<TestApi.Response>(new TestHandler.Command { Id = request.Id });
+        var response = await wolverine.InvokeAsync<TestHandler.Response>(new TestHandler.Command { Id = request.Id }.WithGroupId("sequential"));
 
         return new()
         {

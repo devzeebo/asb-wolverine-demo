@@ -42,11 +42,11 @@ builder.Services.AddWolverine(opts =>
     opts.PersistMessagesWithSqlServer(builder.Configuration.GetConnectionString("sql")!, "Wolverine")
         .EnableCommandQueues(false);
 
-    // opts.ListenToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
-    //     .RequireSessions()
-    //     .Sequential();
-    // opts.PublishMessage<TestHandler.Command>()
-    //     .ToAzureServiceBusQueue(GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
+    opts.ListenToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!)
+        .RequireSessions()
+        .Sequential();
+    opts.PublishMessage<TestHandler.Command>()
+        .ToAzureServiceBusQueue(AzureServiceBusQueueNames.GetAzureServiceBusQueueName(typeof(TestHandler.Command))!);
     //     .RequireSessions();
 
     opts.Policies.AutoApplyTransactions();
